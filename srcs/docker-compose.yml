@@ -1,0 +1,35 @@
+version: "1"
+networks:
+  default:
+    name: 42_inception
+services:
+  mariadb:
+    build: requirements/mariadb/.
+    container_name: mariadb
+    networks:
+      - default
+    volumes:
+      - ../volumes/mariadb:/var/lib/mysql
+    env_file:
+      - .env
+  wordpress:
+    build: requirements/wordpress/.
+    container_name: wordpress
+    networks:
+      - default
+    volumes:
+      - ../volumes/wordpress:/var/www/html
+    depends_on:
+      - mariadb
+  nginx:
+    build: requirements/nginx/.
+    container_name: nginx
+    networks:
+      - default
+    ports:
+      - "8080:8080"
+      - "443:443"
+    volumes:
+      - ../volumes/nginx:/var/www/html
+    depends_on:
+      - wordpress
