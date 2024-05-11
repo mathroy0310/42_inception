@@ -1,35 +1,77 @@
-version: "1"
+# Version of docker-compose
+version: '3.9'
+
 networks:
   default:
     name: 42_inception
+
+volumes:
+  wp:
+    name: wp_volume
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: ${VOLUMES_PATH}/wordpress
+  sql:
+    name: db_volume
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: ${VOLUMES_PATH}/mysql
+
 services:
-  mariadb:
-    build: requirements/mariadb/.
+  mariadb: ### mariadb ###
+    image: mariadb
     container_name: mariadb
     networks:
       - default
+    build: 
+      context: requirements/mariadb/.
+      dockerfile: Dockerfile
+      args:
+        - SQL_DATABASE=${SQL_DATABASE}
+        - SQL_USER=${SQL_USER}
+        - SQL_PASSWORD=${SQL_PASSWORD}
+        - SQL_ROOT_PASSWORD=${SQL_ROOT_PASSWORD}
+    env_file: .env
+    restart: on-failure
+    expose:
+      - "3306"
     volumes:
-      - ../volumes/mariadb:/var/lib/mysql
-    env_file:
-      - .env
-  wordpress:
-    build: requirements/wordpress/.
+      - sql:/var/lib/mysql
+
+  wordpress: ### wordpress ###
+    image: wordpress
     container_name: wordpress
     networks:
       - default
-    volumes:
-      - ../volumes/wordpress:/var/www/html
+    build:
+      context: requirements/wordpress/.
+      dockerfile: Dockerfile
     depends_on:
       - mariadb
-  nginx:
-    build: requirements/nginx/.
+    restart: on-failure
+    expose:
+      - "9000"
+    volumes:
+      - wp:/var/www/html
+
+  nginx: ### nginx ###
+    image: nginx
     container_name: nginx
     networks:
       - default
+    depends_on:
+      - wordpress
+    build:
+      context: requirements/nginx/.
+      dockerfile: Dockerfile
+    env_file: .env
+    restart: on-failure
     ports:
       - "8080:8080"
       - "443:443"
     volumes:
-      - ../volumes/nginx:/var/www/html
-    depends_on:
-      - wordpress
+      - wp:/var/www/html

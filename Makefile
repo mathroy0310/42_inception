@@ -12,7 +12,7 @@ restart:
 	@docker compose up -d
 
 clean_images: clean_containers clean_volumes clean_networks
-	@docker rmi -f $(shell docker images -qa) 2>/dev/null 1>/dev/null || true
+	@docker rm -f $(shell docker images -qa) 2>/dev/null 1>/dev/null || true
 	@printf "\033[0;32mAll images have been removed.\033[0m\n"
 	@docker buildx prune -f 2>/dev/null 1>/dev/null || true
 	@printf "\033[0;32mAll buildx have been removed.\033[0m\n"
