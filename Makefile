@@ -1,36 +1,52 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: maroy <maroy@student.42quebec.com>         +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2024/07/30 16:48:55 by maroy             #+#    #+#              #
+#    Updated: 2024/07/30 19:53:27 by maroy            ###   ########.qc        #
+#                                                                              #
+# **************************************************************************** #
+
+
+DOCKER = docker
+DOCKER_COMPOSE = docker-compose
+YML = srcs/docker-compose.yml
+
 start:
-	@docker compose up -d
+	@$(DOCKER_COMPOSE) -f $(YML) up --build
 
 force:
-	@docker compose up -d --force-recreate
+	@$(DOCKER_COMPOSE) -f $(YML) up -d --force-recreate
 
 stop:
-	@docker compose down
+	@$(DOCKER_COMPOSE) -f $(YML) down
 
-restart:
-	@docker compose down
-	@docker compose up -d
+re:
+	@$(DOCKER_COMPOSE) -f $(YML) down
+	@$(DOCKER_COMPOSE) -f $(YML) up -d
 
-clean_images: clean_containers clean_volumes clean_networks
-	@docker rm -f $(shell docker images -qa) 2>/dev/null 1>/dev/null || true
-	@printf "\033[0;32mAll images have been removed.\033[0m\n"
-	@docker buildx prune -f 2>/dev/null 1>/dev/null || true
-	@printf "\033[0;32mAll buildx have been removed.\033[0m\n"
+clean_images:
+	@$(DOCKER) rmi -f $$(docker images --filter "label=com.docker.compose.project=$(COMPOSE_PROJECT_NAME)" -q) 2>/dev/null 1>/dev/null || true
+	@echo "\033[0;32mAll images related to the project have been removed.\033[0m"
 
 clean_containers:
-	@docker rm -f $(shell docker ps -q) 2>/dev/null 1>/dev/null || true
-	@printf "\033[0;32mAll containers have been removed.\033[0m\n"
+	@$(DOCKER_COMPOSE) -f $(YML) down -v
+	@echo "\033[0;32mAll containers and associated volumes have been removed.\033[0m"
 
 clean_volumes:
-	@docker volume rm $(shell docker volume ls -q) 2>/dev/null 1>/dev/null || true
-	@printf "\033[0;32mAll volumes have been removed.\033[0m\n"
+	@$(DOCKER) volume rm $$(docker volume ls --filter "label=com.docker.compose.project=$(COMPOSE_PROJECT_NAME)" -q) 2>/dev/null 1>/dev/null || true
+	@echo "\033[0;32mAll volumes related to the project have been removed.\033[0m"
 
 clean_networks:
-	@docker network rm $(shell docker network ls -q) 2>/dev/null 1>/dev/null || true
-	@printf "\033[0;32mAll networks have been removed.\033[0m\n"
+	@$(DOCKER) network rm $$(docker network ls --filter "label=com.docker.compose.project=$(COMPOSE_PROJECT_NAME)" -q) 2>/dev/null 1>/dev/null || true
+	@echo "\033[0;32mAll networks related to the project have been removed.\033[0m"
 
-clean_directories:
-	@rm -rf ../volumes
-
-clean: clean_images clean_directories
-	@docker compose down
+clean:
+	@$(DOCKER_COMPOSE) -f $(YML) down -v
+	@$(MAKE) clean_images
+	@$(MAKE) clean_volumes
+	@$(MAKE) clean_networks
+	@echo "\033[0;32mAll resources related to the project have been cleaned.\033[0m"

@@ -1,10 +1,13 @@
 FROM debian:bullseye
 
-RUN apt update -y && apt-get install -y nginx && apt-get clean
+RUN apt-get update -y && apt-get install -y \
+    nginx \
+    openssl \
+    libssl-dev \ 
+    && apt-get clean
 
-COPY ./conf/nginx.conf /etc/nginx/conf.d/default.conf
+COPY conf/default.conf /etc/nginx/conf.d/
 
-COPY ./tools/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY tools/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
-CMD ["/usr/local/bin/entrypoint.sh"]
-
+CMD ["sh", "/usr/local/bin//entrypoint.sh"]

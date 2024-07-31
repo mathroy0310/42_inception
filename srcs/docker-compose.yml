@@ -1,77 +1,55 @@
-# Version of docker-compose
 version: '3.9'
 
 networks:
   default:
-    name: 42_inception
+    name: inception_network
 
 volumes:
-  wp:
-    name: wp_volume
-    driver: local
-    driver_opts:
-      type: 'none'
-      o: 'bind'
-      device: ${VOLUMES_PATH}/wordpress
-  sql:
-    name: db_volume
-    driver: local
-    driver_opts:
-      type: 'none'
-      o: 'bind'
-      device: ${VOLUMES_PATH}/mysql
+  wordpress_data:
+    name: inception_wordpress_volume
+  mariadb_data:
+    name: inception_mariadb_volume
 
 services:
-  mariadb: ### mariadb ###
-    image: mariadb
-    container_name: mariadb
+  mariadb_service: ### MariaDB ###
+    image: inception_mariadb
+    container_name: inception_mariadb_container
     networks:
       - default
     build: 
-      context: requirements/mariadb/.
+      context: requirements/mariadb/
       dockerfile: Dockerfile
-      args:
-        - SQL_DATABASE=${SQL_DATABASE}
-        - SQL_USER=${SQL_USER}
-        - SQL_PASSWORD=${SQL_PASSWORD}
-        - SQL_ROOT_PASSWORD=${SQL_ROOT_PASSWORD}
     env_file: .env
-    restart: on-failure
     expose:
       - "3306"
     volumes:
-      - sql:/var/lib/mysql
+      - mariadb_data:/var/lib/mysql
 
-  wordpress: ### wordpress ###
-    image: wordpress
-    container_name: wordpress
+  wordpress_service: ### WordPress ###
+    image: inception_wordpress
+    container_name: inception_wordpress_container
     networks:
       - default
     build:
-      context: requirements/wordpress/.
+      context: requirements/wordpress/
       dockerfile: Dockerfile
     depends_on:
-      - mariadb
-    restart: on-failure
+      - mariadb_service
     expose:
       - "9000"
     volumes:
-      - wp:/var/www/html
+      - wordpress_data:/var/www/html
 
-  nginx: ### nginx ###
-    image: nginx
-    container_name: nginx
+  nginx_service: ### Nginx ###
+    image: inception_nginx
+    container_name: inception_nginx_container
     networks:
       - default
     depends_on:
-      - wordpress
+      - wordpress_service
     build:
-      context: requirements/nginx/.
+      context: requirements/nginx/
       dockerfile: Dockerfile
-    env_file: .env
-    restart: on-failure
     ports:
       - "8080:8080"
       - "443:443"
-    volumes:
-      - wp:/var/www/html

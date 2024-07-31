@@ -7,7 +7,8 @@ RUN apt-get update && apt-get install -y \
 	php-mysql \
 	php-mbstring \
 	wget \
-	unzip && apt-get clean
+	unzip \ 
+	&& apt-get clean
 
 COPY ./tools/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
