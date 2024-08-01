@@ -9,3 +9,4 @@ fi
 
 # Start nginx
 nginx -g 'daemon off;'
+echo "Nginx started."

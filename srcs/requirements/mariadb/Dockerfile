@@ -7,5 +7,8 @@ RUN apt-get update -y && apt-get install -y \
 COPY ./conf/50-server.cnf /etc/mysql/mariadb.conf.d/
 
 COPY ./tools/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY ./tools/health_check.sh /usr/local/bin/health_check.sh
+
 RUN chmod +x /usr/local/bin/entrypoint.sh
-CMD ["sh", "/usr/local/bin/entrypoint.sh"]
+RUN chmod +x /usr/local/bin/health_check.sh
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
