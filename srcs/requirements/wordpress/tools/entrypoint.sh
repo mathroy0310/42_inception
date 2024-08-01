@@ -1,3 +1,15 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    entrypoint.sh                                      :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: maroy <maroy@student.42.fr>                +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2024/08/01 15:20:19 by maroy             #+#    #+#              #
+#    Updated: 2024/08/01 15:20:20 by maroy            ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
 #!/bin/bash
 set -e
 
@@ -9,9 +21,6 @@ mv wp-cli.phar /usr/local/bin/wp
 
 # Ensure PHP run directory exists
 mkdir -p /run/php
-
-# Change to WordPress directory
-cd /var/www/html
 
 # Check if WordPress is installed
 if [ ! -f wp-config.php ]; then
@@ -32,6 +41,9 @@ if [ ! -f wp-config.php ]; then
         --dbuser="$MYSQL_USER" \
         --dbpass="$MYSQL_PASSWORD" \
         --dbhost="$MYSQL_HOST" \
+		--dbcharset="utf8" \
+        --dbcollate="utf8_general_ci" \
+        --path="/var/www/html" \
         --allow-root
 
     # Install WordPress
@@ -42,20 +54,26 @@ if [ ! -f wp-config.php ]; then
         --admin_user="$WP_ADMIN_USER" \
         --admin_password="$WP_ADMIN_PASSWORD" \
         --admin_email="$WP_ADMIN_EMAIL" \
+		--skip-email \
+		--path="/var/www/html" \
         --allow-root
 
     # Create a new user
     echo "Creating WordPress user..."
-    wp user create "$WP_USER_USER" "$WP_USER_EMAIL" --role=author --user_pass="$WP_USER_PASSWORD" --allow-root
+    wp user create \
+		"$WP_USER_USER" \
+		"$WP_USER_EMAIL" \
+		--role=author \
+		--user_pass="$WP_USER_PASSWORD" \
+		--allow-root
 
 	echo "Displaying WordPress information..."
 	wp db info
 	wp user list
-
-
 else
     echo "WordPress already installed."
 fi
+echo "Wordpress listening on port 9000"
 
 # Adjust PHP-FPM configuration for socket connection
 echo "Configuring PHP-FPM..."

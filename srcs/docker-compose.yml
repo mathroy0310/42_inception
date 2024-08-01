@@ -1,14 +1,25 @@
-version: '4'
+version: '3.8'
 
 networks:
   default:
+    driver: bridge
     name: inception_network
 
 volumes:
   wordpress_data:
     name: inception_wordpress_volume
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: ${VOLUMES_PATH}/wordpress
   mariadb_data:
     name: inception_mariadb_volume
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: ${VOLUMES_PATH}/mariadb
 
 services:
   mariadb_service: ### MariaDB ###
@@ -16,10 +27,16 @@ services:
     container_name: inception_mariadb_container
     networks:
       - default
+    hostname: ${MYSQL_HOST}
+    restart: always
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     build: 
       context: requirements/mariadb/
       dockerfile: Dockerfile
-    env_file: .env
     expose:
       - "3306:3306"
     volumes:
@@ -38,7 +55,15 @@ services:
     build:
       context: requirements/wordpress/
       dockerfile: Dockerfile
-    env_file: .env
+    environment:
+      - DOMAIN_NAME=${DOMAIN_NAME}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_HOST=${MYSQL_HOST}
+      - WP_USER_USER=${WP_USER_USER}
+      - WP_USER_PASSWORD=${WP_USER_PASSWORD}
+      - WP_USER_EMAIL=${WP_USER_EMAIL}
     depends_on:
         mariadb_service:
           condition: service_healthy
@@ -52,6 +77,11 @@ services:
     container_name: inception_nginx_container
     networks:
       - default
+    environment:
+      - DOMAIN_NAME=${DOMAIN_NAME}
+      - SSL_CERTIFICATE=${SSL_CERTIFICATE}
+      - SSL_CERTIFICATE_KEY=${SSL_CERTIFICATE_KEY}
+      - MYSQL_HOST=${MYSQL_HOST}
     depends_on:
       - wordpress_service
     build:
@@ -61,3 +91,5 @@ services:
       - "443:443"
     volumes:
       - wordpress_data:/var/www/html
+    extra_hosts:
+      - "maroy.42.qc:127.0.0.1"
