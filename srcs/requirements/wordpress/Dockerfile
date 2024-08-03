@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Dockerfile                                         :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: maroy <maroy@student.42.fr>                +#+  +:+       +#+         #
+#    By: maroy <maroy@student.42quebec.com>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/01 15:20:23 by maroy             #+#    #+#              #
-#    Updated: 2024/08/01 15:20:24 by maroy            ###   ########.fr        #
+#    Updated: 2024/08/02 18:36:30 by maroy            ###   ########.qc        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -33,4 +33,4 @@ RUN ["chmod", "+x", "/usr/bin/php"]
 
 COPY ./tools/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+ENTRYPOINT ["sh", "/usr/local/bin/entrypoint.sh"]

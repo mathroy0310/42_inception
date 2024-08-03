@@ -31,21 +31,17 @@ services:
     restart: always
     environment:
       - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    secrets:
+      - db_password
+      - db_root_password
     build: 
       context: requirements/mariadb/
       dockerfile: Dockerfile
-    expose:
+    ports:
       - "3306:3306"
     volumes:
       - mariadb_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "/usr/local/bin/health_check.sh"]
-      interval: 10s
-      timeout: 1m
-      retries: 5
 
   wordpress_service: ### WordPress ###
     image: inception_wordpress  
@@ -59,16 +55,20 @@ services:
       - DOMAIN_NAME=${DOMAIN_NAME}
       - MYSQL_DATABASE=${MYSQL_DATABASE}
       - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_HOST=${MYSQL_HOST}
       - WP_USER_USER=${WP_USER_USER}
-      - WP_USER_PASSWORD=${WP_USER_PASSWORD}
       - WP_USER_EMAIL=${WP_USER_EMAIL}
+      - WP_ADMIN_USER=${WP_ADMIN_USER}
+      - WP_ADMIN_EMAIL=${WP_ADMIN_EMAIL}
+    secrets:
+      - db_password
+      - db_root_password
+      - wp_password
+      - wp_root_password
     depends_on:
-        mariadb_service:
-          condition: service_healthy
-    expose:
-      - "9000"
+      - mariadb_service
+    ports:
+      - "9000:9000"
     volumes:
       - wordpress_data:/var/www/html
 
@@ -93,3 +93,13 @@ services:
       - wordpress_data:/var/www/html
     extra_hosts:
       - "maroy.42.qc:127.0.0.1"
+
+secrets:
+  db_password:
+    file: ../secrets/db_password.txt
+  db_root_password:
+    file: ../secrets/db_root_password.txt
+  wp_password:
+    file: ../secrets/wp_password.txt
+  wp_root_password:
+    file: ../secrets/wp_root_password.txt

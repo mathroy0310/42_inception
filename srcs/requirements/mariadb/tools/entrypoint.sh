@@ -3,15 +3,17 @@
 #                                                         :::      ::::::::    #
 #    entrypoint.sh                                      :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: maroy <maroy@student.42.fr>                +#+  +:+       +#+         #
+#    By: maroy <maroy@student.42quebec.com>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/01 15:20:35 by maroy             #+#    #+#              #
-#    Updated: 2024/08/01 15:20:36 by maroy            ###   ########.fr        #
+#    Updated: 2024/08/02 19:57:17 by maroy            ###   ########.qc        #
 #                                                                              #
 # **************************************************************************** #
 
 #!/bin/bash
 set -e
+
+MYSQL_PASSWORD=$(cat /run/secrets/db_password)
 
 echo "Creating /etc/mysql/mariadb.conf.d/50-server.cnf..."
 cat > /etc/mysql/mariadb.conf.d/50-server.cnf <<EOF

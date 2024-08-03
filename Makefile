@@ -3,54 +3,67 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: maroy <maroy@student.42.fr>                +#+  +:+       +#+         #
+#    By: maroy <maroy@student.42quebec.com>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/30 16:48:55 by maroy             #+#    #+#              #
-#    Updated: 2024/08/01 14:11:22 by maroy            ###   ########.fr        #
+#    Updated: 2024/08/02 20:19:35 by maroy            ###   ########.qc        #
 #                                                                              #
 # **************************************************************************** #
 
+COMPOSE_PROJECT_NAME = inception
+DOCKER = docker
 DOCKER_COMPOSE = docker-compose
 YML = srcs/docker-compose.yml
 VOLUMES_PATH=/home/maroy/data
 
-all: start
+GREEN = \033[0;32m
+RED = \033[0;31m
+YELLOW = \033[0;33m
+CYAN = \033[0;36m
+NO_COLOR = \033[0m
 
-start:
-	@$(DOCKER_COMPOSE) -f $(YML) up --build
+all: env start
 
-force:
-	@$(DOCKER_COMPOSE) -f $(YML) up -d --force-recreate
+env:
+	sh ./srcs/tools/generate_env.sh;
+	sh ./srcs/tools/generate_password.sh;
+	sh ./srcs/tools/add_hosts.sh;
+	
 
-stop:
-	@$(DOCKER_COMPOSE) -f $(YML) down
+start: 
+	@$(DOCKER_COMPOSE) -f $(YML) --project-name $(COMPOSE_PROJECT_NAME) up --build
 
-re:
-	@$(DOCKER_COMPOSE) -f $(YML) down
-	@$(DOCKER_COMPOSE) -f $(YML) up -d
+force: 
+	@$(DOCKER_COMPOSE) -f $(YML) --project-name $(COMPOSE_PROJECT_NAME) up -d --force-recreate
+
+stop: 
+	@$(DOCKER_COMPOSE) -f $(YML) --project-name $(COMPOSE_PROJECT_NAME) down
+
+re: 
+	@$(DOCKER_COMPOSE) -f $(YML) --project-name $(COMPOSE_PROJECT_NAME) down
+	@$(DOCKER_COMPOSE) -f $(YML) --project-name $(COMPOSE_PROJECT_NAME) up -d
 
 status : 
 	@docker ps
 
-iclean:
+iclean: 
 	@$(DOCKER) rmi -f $$(docker images --filter "label=com.docker.compose.project=$(COMPOSE_PROJECT_NAME)" -q) 2>/dev/null 1>/dev/null || true
-	@echo -e "\033[0;32mAll images related to the project have been removed.\033[0m"
+	@echo -e "$(GREEN)All images related to the project have been removed.\033[0m"
 
-cclean:
-	@$(DOCKER_COMPOSE) -f $(YML) down -v
-	@echo -e "\033[0;32mAll containers and associated volumes have been removed.\033[0m"
+cclean: 
+	@$(DOCKER_COMPOSE) -f $(YML) --project-name $(COMPOSE_PROJECT_NAME) down -v
+	@echo -e "$(GREEN)All containers and associated volumes have been removed.\033[0m"
 
-vclean:
+vclean: 
 	@$(DOCKER) volume rm $$(docker volume ls --filter "label=com.docker.compose.project=$(COMPOSE_PROJECT_NAME)" -q) 2>/dev/null 1>/dev/null || true
-	@echo -e "\033[0;32mAll volumes related to the project have been removed.\033[0m"
+	@echo -e "\$(GREEN)All volumes related to the project have been removed.\033[0m"
 
-nclean:
+nclean: 
 	@$(DOCKER) network rm $$(docker network ls --filter "label=com.docker.compose.project=$(COMPOSE_PROJECT_NAME)" -q) 2>/dev/null 1>/dev/null || true
-	@echo -e "\033[0;32mAll networks related to the project have been removed.\033[0m"
+	@echo -e "$(GREEN)All networks related to the project have been removed.\033[0m"
 
 fclean: iclean vclean nclean
-	@$(DOCKER_COMPOSE) -f $(YML) down -v
-	@echo -e "\033[0;32mAll resources related to the project have been cleaned.\033[0m"
-
+	@$(DOCKER_COMPOSE) -f $(YML) --project-name $(COMPOSE_PROJECT_NAME) down -v
+	@echo -e "$(GREEN)All resources related to the project have been cleaned.\033[0m"
 
 .PHONY: all start force stop re status iclean cclean vclean nclean fclean

@@ -3,15 +3,21 @@
 #                                                         :::      ::::::::    #
 #    entrypoint.sh                                      :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: maroy <maroy@student.42.fr>                +#+  +:+       +#+         #
+#    By: maroy <maroy@student.42quebec.com>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/01 15:20:19 by maroy             #+#    #+#              #
-#    Updated: 2024/08/01 15:20:20 by maroy            ###   ########.fr        #
+#    Updated: 2024/08/02 20:49:29 by maroy            ###   ########.qc        #
 #                                                                              #
 # **************************************************************************** #
 
 #!/bin/bash
 set -e
+
+MYSQL_PASSWORD=$(cat /run/secrets/db_password)
+WP_ADMIN_PASSWORD=$(cat /run/secrets/wp_root_password)
+WP_USER_PASSWORD=$(cat /run/secrets/wp_password)
+echo "DEBUG: DOMAIN_NAME=${DOMAIN_NAME}"
+echo "DEBUG: WP_ADMIN_EMAIL=${WP_ADMIN_EMAIL}"
 
 # Download and set up WP-CLI
 echo "Setting up WP-CLI..."
@@ -22,7 +28,12 @@ mv wp-cli.phar /usr/local/bin/wp
 # Ensure PHP run directory exists
 mkdir -p /run/php
 
+useradd -m -s /bin/bash wordpress
+user wordpress
+
 # Check if WordPress is installed
+rm -rf /var/www/html/*
+echo "troll"
 if [ ! -f wp-config.php ]; then
     echo "WordPress not installed. Installing..."
 
@@ -33,6 +44,8 @@ if [ ! -f wp-config.php ]; then
     else
         echo "WordPress core files already present."
     fi
+
+
 
     # Create WordPress configuration file
     echo "Configuring WordPress..."
@@ -58,7 +71,7 @@ if [ ! -f wp-config.php ]; then
 		--path="/var/www/html" \
         --allow-root
 
-    # Create a new user
+    # Create a new use
     echo "Creating WordPress user..."
     wp user create \
 		"$WP_USER_USER" \
