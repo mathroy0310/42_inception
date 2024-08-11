@@ -2,7 +2,7 @@
 set -e
 
 if [ -f srcs/.env ]; then \
-	echo "An .env file already exists. Do you want to overwrite it ? (y/n)"
+	echo "An .env file already exists. Do you want to overwrite it ? (y/n) default: n"
     read -r answer
     if [ "$answer" != "y" ]; then
         exit 0
@@ -12,7 +12,8 @@ fi
 echo "Generating .env file..."
 echo "---------------------------------"
 
-DOMAIN_NAME="maroy.42.qc"
+
+DOMAIN_NAME="$USER.42.qc"
 MYSQL_DATABASE="inception_db"
 MYSQL_HOST="mariadb_service"
 

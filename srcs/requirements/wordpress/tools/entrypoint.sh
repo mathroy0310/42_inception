@@ -6,7 +6,7 @@
 #    By: maroy <maroy@student.42quebec.com>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/01 15:20:19 by maroy             #+#    #+#              #
-#    Updated: 2024/08/02 20:49:29 by maroy            ###   ########.qc        #
+#    Updated: 2024/08/11 14:26:22 by maroy            ###   ########.qc        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,12 +28,8 @@ mv wp-cli.phar /usr/local/bin/wp
 # Ensure PHP run directory exists
 mkdir -p /run/php
 
-useradd -m -s /bin/bash wordpress
-user wordpress
-
 # Check if WordPress is installed
 rm -rf /var/www/html/*
-echo "troll"
 if [ ! -f wp-config.php ]; then
     echo "WordPress not installed. Installing..."
 
@@ -44,8 +40,6 @@ if [ ! -f wp-config.php ]; then
     else
         echo "WordPress core files already present."
     fi
-
-
 
     # Create WordPress configuration file
     echo "Configuring WordPress..."
@@ -71,18 +65,23 @@ if [ ! -f wp-config.php ]; then
 		--path="/var/www/html" \
         --allow-root
 
-    # Create a new use
+    # Create a new user
     echo "Creating WordPress user..."
+    # Check if the user already exists
+    if wp user get "$WP_USER_USER" --field=user_login --allow-root > /dev/null 2>&1; then
+        echo "User '$WP_USER_USER' already exists."
+    else
+    # Create the user if it does not exist
     wp user create \
-		"$WP_USER_USER" \
-		"$WP_USER_EMAIL" \
-		--role=author \
-		--user_pass="$WP_USER_PASSWORD" \
-		--allow-root
-
-	echo "Displaying WordPress information..."
-	wp db info
-	wp user list
+        "$WP_USER_USER" \
+        "$WP_USER_EMAIL" \
+        --role=author \
+        --user_pass="$WP_USER_PASSWORD" \
+        --allow-root
+    echo "User '$WP_USER_USER' created."
+    fi
+    echo "Displaying users..."
+	wp user list --allow-root
 else
     echo "WordPress already installed."
 fi
