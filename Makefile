@@ -6,7 +6,7 @@
 #    By: maroy <maroy@student.42quebec.com>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/30 16:48:55 by maroy             #+#    #+#              #
-#    Updated: 2024/08/02 20:19:35 by maroy            ###   ########.qc        #
+#    Updated: 2024/08/11 15:58:21 by maroy            ###   ########.qc        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,9 +25,9 @@ NO_COLOR = \033[0m
 all: env start
 
 env:
-	sh ./srcs/tools/generate_env.sh;
-	sh ./srcs/tools/generate_password.sh;
-	sh ./srcs/tools/add_hosts.sh;
+	./srcs/tools/generate_env.sh;
+	./srcs/tools/generate_password.sh;
+	./srcs/tools/add_hosts.sh;
 	
 
 start: 
