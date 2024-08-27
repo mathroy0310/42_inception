@@ -6,7 +6,7 @@
 #    By: maroy <maroy@student.42quebec.com>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/30 16:48:55 by maroy             #+#    #+#              #
-#    Updated: 2024/08/15 15:49:03 by maroy            ###   ########.qc        #
+#    Updated: 2024/08/27 15:25:35 by maroy            ###   ########.qc        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,7 @@ COMPOSE_PROJECT_NAME = inception
 DOCKER = docker
 DOCKER_COMPOSE = docker-compose
 YML = srcs/docker-compose.yml
-VOLUMES_PATH=$(USER)data
+VOLUMES_PATH=$(USER)/data
 
 GREEN = \033[0;32m
 RED = \033[0;31m
