@@ -92,14 +92,14 @@ services:
     volumes:
       - wordpress_data:/var/www/html
     extra_hosts:
-      - "maroy.42.qc:127.0.0.1"
+      - "${DOMAIN_NAME}:127.0.0.1"
 
 secrets:
   db_password:
-    file: ../secrets/db_password.txt
+    file: ${SECRETS_PATH}/db_password.txt
   db_root_password:
-    file: ../secrets/db_root_password.txt
+    file: ${SECRETS_PATH}/db_root_password.txt
   wp_password:
-    file: ../secrets/wp_password.txt
+    file: ${SECRETS_PATH}/wp_password.txt
   wp_root_password:
-    file: ../secrets/wp_root_password.txt
+    file: ${SECRETS_PATH}/wp_root_password.txt

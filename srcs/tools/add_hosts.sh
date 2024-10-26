@@ -6,21 +6,20 @@
 #    By: maroy <maroy@student.42quebec.com>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/02 20:13:21 by maroy             #+#    #+#              #
-#    Updated: 2024/08/15 15:49:07 by maroy            ###   ########.qc        #
+#    Updated: 2024/10/26 17:16:06 by maroy            ###   ########.qc        #
 #                                                                              #
 # **************************************************************************** #
 
 #!/bin/bash
 set -e
 
-DOMAIN_NAME="maroy.42.qc"
+if [ -f srcs/.env ]; then
+    export DOMAIN_NAME=$(grep '^DOMAIN_NAME=' srcs/.env | cut -d '=' -f2-)
+    echo "DOMAIN_NAME exported"
+fi
+
 DOMAIN_NAME_WWW="www.${DOMAIN_NAME}"
 IP_ADDRESS="127.0.0.1"
-
-if [ "$(id -u)" -ne 0 ]; then
-    echo "Please run as root."
-    exit 0
-fi
 
 # Function to add domain to /etc/hosts
 add_domain_to_hosts() {

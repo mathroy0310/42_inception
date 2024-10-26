@@ -6,7 +6,7 @@
 #    By: maroy <maroy@student.42quebec.com>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/01 15:20:19 by maroy             #+#    #+#              #
-#    Updated: 2024/08/11 14:26:22 by maroy            ###   ########.qc        #
+#    Updated: 2024/10/26 17:25:57 by maroy            ###   ########.qc        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,8 +16,6 @@ set -e
 MYSQL_PASSWORD=$(cat /run/secrets/db_password)
 WP_ADMIN_PASSWORD=$(cat /run/secrets/wp_root_password)
 WP_USER_PASSWORD=$(cat /run/secrets/wp_password)
-echo "DEBUG: DOMAIN_NAME=${DOMAIN_NAME}"
-echo "DEBUG: WP_ADMIN_EMAIL=${WP_ADMIN_EMAIL}"
 
 # Download and set up WP-CLI
 echo "Setting up WP-CLI..."

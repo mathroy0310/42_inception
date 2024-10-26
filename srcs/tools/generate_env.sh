@@ -6,7 +6,7 @@
 #    By: maroy <maroy@student.42quebec.com>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/15 15:49:20 by maroy             #+#    #+#              #
-#    Updated: 2024/08/15 15:49:21 by maroy            ###   ########.qc        #
+#    Updated: 2024/10/26 17:25:39 by maroy            ###   ########.qc        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,7 +24,6 @@ fi
 echo "Generating .env file..."
 echo "---------------------------------"
 
-
 DOMAIN_NAME="$USER.42.qc"
 MYSQL_DATABASE="inception_db"
 MYSQL_HOST="mariadb_service"
@@ -35,6 +34,12 @@ SSL_CERTIFICATE="/etc/nginx/ssl/bundle.crt"
 SSL_CERTIFICATE_KEY="/etc/nginx/ssl/private.key"
 
 VOLUMES_PATH=$HOME/data
+
+SECRETS_PATH=$PWD/secrets
+
+# Domain Name
+read -p "Enter domain name (default: $DOMAIN_NAME) : " DOMAIN_NAME
+DOMAIN_NAME=${DOMAIN_NAME:DOMAIN_NAME}
 
 # MySQL
 read -p "Enter MySQL user (default: $USER): " MYSQL_USER
@@ -75,6 +80,9 @@ SSL_CERTIFICATE_KEY=${SSL_CERTIFICATE_KEY}
 
 # Volumes path
 VOLUMES_PATH=${VOLUMES_PATH}
+
+# Secrets path
+SECRETS_PATH=${SECRETS_PATH}
 EOF
 
 echo "---------------------------------"

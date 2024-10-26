@@ -6,7 +6,7 @@
 #    By: maroy <maroy@student.42quebec.com>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/30 16:48:55 by maroy             #+#    #+#              #
-#    Updated: 2024/08/27 15:25:35 by maroy            ###   ########.qc        #
+#    Updated: 2024/10/26 17:19:39 by maroy            ###   ########.qc        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,7 @@ COMPOSE_PROJECT_NAME = inception
 DOCKER = docker
 DOCKER_COMPOSE = docker-compose
 YML = srcs/docker-compose.yml
-VOLUMES_PATH=$(USER)/data
+VOLUMES_PATH=$(HOME)/data
 
 GREEN = \033[0;32m
 RED = \033[0;31m
@@ -25,11 +25,20 @@ NO_COLOR = \033[0m
 all: env start
 
 env:
+	@clear
+	@echo "${GREEN}Preparing workspace environment...${NO_COLOR}"
+	@echo "---------------------------------"
 	mkdir -p $(VOLUMES_PATH)/mariadb
 	mkdir -p $(VOLUMES_PATH)/wordpress
-	./srcs/tools/generate_env.sh;
-	./srcs/tools/generate_password.sh;
-	./srcs/tools/add_hosts.sh;
+	sh ./srcs/tools/generate_env.sh;
+	sh ./srcs/tools/generate_password.sh;
+ifneq ($(shell id -u), 0)
+	@echo "${YELLOW}You are not root, cannot add domain name to known host ${NO_COLOR}"
+	@echo "${YELLOW}Skipping add_hosts.sh ...${NO_COLOR}"
+else
+	sh ./srcs/tools/add_hosts.sh
+endif
+
 	
 
 start: 
